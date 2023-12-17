@@ -11,17 +11,17 @@ const express = require('express')
 const app = express()
 
 //Connect DB
-const connectDB = require('./db/connect')
+const connectDB = require('./src/db/connect')
 
-const authenticateUser = require('./middleware/authentication')
+const authenticateUser = require('./src/middleware/authentication')
 
 //router
-const authRouter = require('./routes/auth')
-const jobRouter = require('./routes/jobs')
+const authRouter = require('./src/routes/auth')
+const jobRouter = require('./src/routes/jobs')
 
 // error handler
-const notFoundMiddleware = require('./middleware/not-found')
-const errorHandlerMiddleware = require('./middleware/error-handler')
+const notFoundMiddleware = require('./src/middleware/not-found')
+const errorHandlerMiddleware = require('./src/middleware/error-handler')
 
 app.set('trust proxy', 1)
 app.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 100 }))
