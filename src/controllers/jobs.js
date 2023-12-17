@@ -1,68 +1,52 @@
 const Job = require('../models/Job')
 const { StatusCodes } = require('http-status-codes')
 const { BadRequestError, NotFoundError } = require('../errors')
+const jobService = require('../services/jobs')
 
 const GetAllJobs = async (req, res) => {
-  const jobs = await Job.find({ createdBy: req.user.userId }).sort('createdAt')
-  res.status(200).json({ jobs, count: jobs.length })
+  try {
+    const jobs = await jobService.GetAllJob(req)
+    res.status(StatusCodes.OK).json({ jobs, count: jobs.length })
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 const GetJob = async (req, res) => {
-  const {
-    user: { userId },
-    params: { id: jobId },
-  } = req
-
-  const job = await Job.findOne({ _id: jobId, createdBy: userId })
-
-  if (!job) {
-    throw new NotFoundError(`No job with id ${jobId}`)
+  try {
+    const job = await jobService.GetJob(req)
+    return res.status(StatusCodes.OK).json(job)
+  } catch (err) {
+    console.log(err)
   }
-
-  return res.status(StatusCodes.OK).json({ job })
 }
 
 const CreateJob = async (req, res) => {
-  req.body.createdBy = req.user.userId
-  const job = await Job.create(req.body)
-  res.status(StatusCodes.CREATED).json(job)
+  try {
+    req.body.createdBy = req.user.userId
+    const job = await jobService.CreateJob(req.body)
+    res.status(StatusCodes.CREATED).json(job)
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 const UpdateJob = async (req, res) => {
-  const {
-    body: { company, position },
-    user: { userId },
-    params: { id: jobId },
-  } = req
-
-  if (company === '' || position === '')
-    throw new BadRequestError('Company or Position fields cannot be empty')
-
-  const job = await Job.findByIdAndUpdate(
-    { _id: jobId, createdBy: userId },
-    req.body,
-    { new: true, runValidators: true }
-  )
-
-  if (!job) {
-    throw new NotFoundError(`No job with id ${jobId}`)
+  try {
+    const job = await jobService.UpdateJob(req)
+    return res.status(StatusCodes.OK).json({ job })
+  } catch (err) {
+    console.log(err)
   }
-
-  return res.status(StatusCodes.OK).json({ job })
 }
 
 const DeleteJob = async (req, res) => {
-  const {
-    user: { userId },
-    params: { id: jobId },
-  } = req
-
-  const job = await Job.findByIdAndDelete({ _id: jobId, createdBy: userId })
-  if (!job) {
-    throw new NotFoundError(`No job with id ${jobId}`)
+  try {
+    const job = await jobService.DeleteJob(req)
+    return res.status(StatusCodes.OK).json({ msg: 'Delete successfully' })
+  } catch (err) {
+    console.log(err)
   }
-
-  return res.status(StatusCodes.OK).json({ msg: 'Delete successfully' })
 }
 
 module.exports = {
