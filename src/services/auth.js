@@ -1,23 +1,6 @@
 const User = require('../models/User')
 const { StatusCodes } = require('http-status-codes')
 const { BadRequestError, UnauthenticatedError } = require('../errors')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-
-const createJWT = () => {
-  return jwt.sign(
-    { userId: this._id, name: this.name },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_LIFETIME,
-    }
-  )
-}
-
-const comparePassword = async (isPassword) => {
-  const isMatch = await bcrypt.compare(isPassword, this.password)
-  return isMatch
-}
 
 const UserLogin = async (data) => {
   try {
@@ -33,7 +16,7 @@ const UserLogin = async (data) => {
     const isPassword = await user.comparePassword(password)
     if (!isPassword) throw new UnauthenticatedError('Invalid Credentials')
 
-    const token = createJWT()
+    const token = user.createJWT()
 
     return { user, token }
   } catch (err) {
@@ -41,6 +24,25 @@ const UserLogin = async (data) => {
   }
 }
 
-const UserRegister = async (data) => {}
+const UpdateUser = async (req) => {
+  try {
+    const {
+      body: { email, name, lastName, location },
+      user: { userId },
+    } = req
+    if (!email || !name || !lastName || !location) {
+      throw new BadRequestError('Please provide all values')
+    }
+    const user = await User.findByIdAndUpdate(
+      { _id: userId },
+      { email, name, lastName, location },
+      { new: true }
+    )
+    const token = user.createJWT()
+    return { user, token }
+  } catch (err) {
+    throw err
+  }
+}
 
-module.exports = { UserLogin }
+module.exports = { UserLogin, UpdateUser }
