@@ -5,8 +5,8 @@ const jobService = require('../services/jobs')
 
 const GetAllJobs = async (req, res) => {
   try {
-    const jobs = await jobService.GetAllJob(req)
-    res.status(StatusCodes.OK).json({ jobs, count: jobs.length })
+    const { jobs, totalJobs, numOfPages } = await jobService.GetAllJob(req)
+    res.status(StatusCodes.OK).json({ jobs, totalJobs, numOfPages })
   } catch (err) {
     console.log(err)
   }
