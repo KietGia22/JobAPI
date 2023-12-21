@@ -8,10 +8,12 @@ const {
   CreateJob,
   UpdateJob,
   DeleteJob,
+  showStats,
 } = require('../controllers/jobs')
 const { route } = require('./auth')
 
 router.route('/').post(testUser, CreateJob).get(GetAllJobs)
+router.route('/stats').get(showStats)
 router
   .route('/:id')
   .get(GetJob)
