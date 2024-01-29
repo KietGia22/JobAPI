@@ -40,6 +40,8 @@ const GetAllJob = async (req) => {
 
     result = result.skip(skip).limit(limit)
 
+    console.log(result)
+
     const jobs = await result
 
     const totalJobs = await Job.countDocuments(queryObject)
